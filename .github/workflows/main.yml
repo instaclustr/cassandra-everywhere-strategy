@@ -1,0 +1,80 @@
+name: Build & Publish Release
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - v*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/setup-java@v1.3.0
+        with:
+          java-version: 1.8
+
+      - uses: jfrog/setup-jfrog-cli@v1.0.5
+
+      - name: Setup JFrog CLI
+        run: |
+          jfrog bt config --user "${BINTRAY_API_USER}" --key "${BINTRAY_API_KEY}"
+
+        env:
+          BINTRAY_API_USER: ${{ secrets.BINTRAY_API_USER }}
+          BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+
+      - uses: actions/cache@v1
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - uses: actions/checkout@v2
+
+      - run: mvn -B package
+
+      - name: Release to GitHub
+        continue-on-error: true
+        run: |
+          set -xu
+          assets=()
+          for asset in target/*.{jar,deb,rpm}; do
+            assets+=("-a" "${asset}")
+          done
+          tag="${GITHUB_REF##*/}"
+
+          hub release edit "${assets[@]}" -m "${tag}" "${tag}"
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Release to Bintray
+        continue-on-error: true
+        run: |
+          set -xu
+          tag="${GITHUB_REF##*/}"
+
+          # debian
+          deb_file=(target/*.deb)
+          deb_version=$(dpkg-deb --field "${deb_file}" Version)
+
+          target="instaclustr/debian/instaclustr-everywhere-strategy/${deb_version}"
+
+          jfrog bt version-create --github-tag-rel-notes --vcs-tag "${tag}" "${target}" || true
+          jfrog bt upload --deb stable/main/all "${deb_file}" "${target}"
+          jfrog bt version-publish "${target}"
+
+          # rpm
+          rpm_file=(target/*.rpm)
+          rpm_version=$(rpm -q --qf '%{VERSION}' "${rpm_file}") || true
+
+          target="instaclustr/rpm/instaclustr-everywhere-strategy/${rpm_version}"
+
+          jfrog bt version-create "${target}" || true
+          jfrog bt upload "${rpm_file}" "${target}"
+          jfrog bt version-publish "${target}"
+
