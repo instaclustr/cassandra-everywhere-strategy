@@ -4,7 +4,7 @@
 
     <groupId>com.instaclustr</groupId>
     <artifactId>everywhere-strategy</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
 
     <url>https://github.com/instaclustr/everywhere-strategy</url>
 
@@ -18,7 +18,7 @@
     <scm>
         <connection>scm:git:git://github.com/instaclustr/everywhere-strategy.git</connection>
         <url>${project.url}</url>
-        <tag>HEAD</tag>
+        <tag>v1.0</tag>
     </scm>
 
     <properties>
