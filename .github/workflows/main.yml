@@ -2,8 +2,6 @@ name: Build & Publish Release
 
 on:
   push:
-    branches:
-      - master
     tags:
       - v*
 
@@ -47,7 +45,7 @@ jobs:
           done
           tag="${GITHUB_REF##*/}"
 
-          hub release edit "${assets[@]}" -m "${tag}" "${tag}"
+          hub release create "${assets[@]}" -m "${tag}" "${tag}"
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
