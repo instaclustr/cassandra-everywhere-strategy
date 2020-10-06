@@ -1,17 +1,17 @@
 package org.apache.cassandra.locator;
 
+import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import com.google.common.collect.ImmutableMap;
 import org.apache.cassandra.dht.Token;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.lang.reflect.Field;
-import java.net.InetAddress;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /*
     The strategy should be DC-aware, but DC-awareness is hardcoded to NTS throughout Cassandra.
@@ -19,11 +19,15 @@ import java.util.Set;
     Hence why this implementation subclasses NTS.
  */
 public class EverywhereStrategy extends NetworkTopologyStrategy {
+
     private static final Logger logger = LoggerFactory.getLogger(EverywhereStrategy.class);
 
-    protected final Map<String, Integer> datacenters;
+    protected final Map<String, ReplicationFactor> datacenters;
 
-    public EverywhereStrategy(final String keyspaceName, final TokenMetadata tokenMetadata, final IEndpointSnitch snitch, final Map<String, String> configOptions) throws NoSuchFieldException, IllegalAccessException {
+    public EverywhereStrategy(final String keyspaceName,
+                              final TokenMetadata tokenMetadata,
+                              final IEndpointSnitch snitch,
+                              final Map<String, String> configOptions) throws NoSuchFieldException, IllegalAccessException {
         super(keyspaceName, tokenMetadata, snitch, null);
 
         if (configOptions != null && configOptions.size() != 0) {
@@ -43,22 +47,38 @@ public class EverywhereStrategy extends NetworkTopologyStrategy {
 
     // this gets called whenever the ring topology changes.
     // redetermine the RF for each DC.
-    public List<InetAddress> calculateNaturalEndpoints(final Token token, final TokenMetadata tokenMetadata) {
-        final Set<InetAddress> endpoints = tokenMetadata.getAllEndpoints();
+    @Override
+    public EndpointsForRange calculateNaturalReplicas(Token searchToken, TokenMetadata tokenMetadata) {
+        final Set<InetAddressAndPort> endpoints = tokenMetadata.getAllEndpoints();
 
-        final Map<String, Integer> previousDataCenters = ImmutableMap.copyOf(this.datacenters);
+        final Map<String, ReplicationFactor> previousDataCenters = ImmutableMap.copyOf(this.datacenters);
 
         this.datacenters.clear();
 
-        for (final InetAddress endpoint : endpoints) {
+        for (final InetAddressAndPort endpoint : endpoints) {
             final String datacenter = this.snitch.getDatacenter(endpoint);
-            this.datacenters.merge(datacenter, 1, Integer::sum);
+            this.datacenters.merge(datacenter, ReplicationFactor.fromString("1"), (rf1, rf2) -> ReplicationFactor.fullOnly(rf1.fullReplicas + rf2.fullReplicas));
         }
 
         if (!previousDataCenters.equals(this.datacenters)) {
             logger.info("Data center replication factors for keyspace '{}' = {}", this.keyspaceName, this.datacenters);
         }
 
-        return super.calculateNaturalEndpoints(token, tokenMetadata);
+        return super.calculateNaturalReplicas(searchToken, tokenMetadata);
+    }
+
+    @Override
+    public Collection<String> recognizedOptions() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public void validateOptions() throws ConfigurationException {
+        super.validateOptions();
+    }
+
+    @Override
+    protected void validateExpectedOptions() throws ConfigurationException {
+        // do nothing, we are not excepting any options and method in super would throw as we have not provided any
     }
 }

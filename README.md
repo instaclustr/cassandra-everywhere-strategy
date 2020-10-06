@@ -143,16 +143,16 @@ So we resort to reflection to fix this. Yuck. But, it works…
 
 ## Version Compatibility
 
+You are reading this document from branch 4.0. Please switch to the other branches for different Cassandra version if necessary.
+
 | Cassandra Version | Status |
 | --- | --- |
 | 3.11.x | Compatible |
-| 4.x | _Untested_ |
+| 4.x | Compatible |
 | 3.0.x | _Untested_ |
 | 2.2.x | _Untested_ |
 | 2.1.x | _Untested_ |
 | 2.0.x | Unsupported |
-
-
 
 ## License
 

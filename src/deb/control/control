@@ -3,5 +3,5 @@ Version: [[version]]
 Section: misc
 Priority: optional
 Architecture: all
-Depends: cassandra (>= 2.0)
+Depends: cassandra (>= 4.0)
 Maintainer: [[maintainer]]
