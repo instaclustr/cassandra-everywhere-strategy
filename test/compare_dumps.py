@@ -84,6 +84,7 @@ def flush_dump_compare(nodes: Iterable[Node], dump_dir: Path):
     for node in nodes:
         results = node.run_sstabledump(keyspace='example')
         for i, result in enumerate(results):
+            dump_dir.mkdir(parents=True,exist_ok=True)
             path = (dump_dir / f'{node.ip_addr}-{i}.json')
             logger.info(f'Writing {node.ip_addr} dump to {path}')
             with path.open('wb') as f:
