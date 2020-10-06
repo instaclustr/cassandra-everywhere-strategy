@@ -65,7 +65,7 @@ for tarball installs of Cassandra.
 ## Testing
 
 Some automated tests leveraging [Cassandra Cluster Manager](https://github.com/riptano/ccm) (CCM) exist in the
-[`tests/`](tests/) directory.
+[`test/`](test/) directory.
 
 The basic gist of testing is as follows:
 
