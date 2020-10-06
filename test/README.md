@@ -1,6 +1,6 @@
 # Tests
 
-* `ccm-test`: simple test that spins up a multi-node Apache Cassandra cluster withthe `instaclustr-everywhere-strategy`
+* `ccm-test`: simple test that spins up a multi-node Apache Cassandra cluster with the `instaclustr-everywhere-strategy`
     JAR installed.
     
 * `dse-migrate-test`: e2e test that validates a DSE → Apache Cassandra migration.
