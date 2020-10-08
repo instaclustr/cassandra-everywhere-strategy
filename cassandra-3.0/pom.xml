@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+        <groupId>com.instaclustr</groupId>
+        <artifactId>everywhere-strategy-parent</artifactId>
+        <version>1.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    
+    <artifactId>everywhere-strategy-cassandra-3.0</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    
+    <name>everywhere-strategy-cassandra-3.0</name>
+    <description>An EverywhereStrategy implementation for Apache Cassandra 3.0</description>
+    
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.cassandra</groupId>
+            <artifactId>cassandra-all</artifactId>
+            <version>3.0.22</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+    
+    <build>
+        <finalName>instaclustr-${project.artifactId}-${project.version}</finalName>
+        
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                
+                <configuration>
+                    <tagNameFormat>v3.0-@{project.version}</tagNameFormat>
+                </configuration>
+            </plugin>
+            
+            <plugin>
+                <artifactId>jdeb</artifactId>
+                <groupId>org.vafer</groupId>
+            </plugin>
+            
+            <plugin>
+                <groupId>de.dentrassi.maven</groupId>
+                <artifactId>rpm</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>rpm</goal>
+                        </goals>
+                        <configuration>
+                            <requires>
+                                <require>
+                                    <name>cassandra</name>
+                                    <version>3.0</version>
+                                    <greaterOrEqual/>
+                                </require>
+                            </requires>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -1,123 +1,145 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+    
     <groupId>com.instaclustr</groupId>
-    <artifactId>everywhere-strategy</artifactId>
-    <version>1.0-SNAPSHOT</version>
-
-    <url>https://github.com/instaclustr/everywhere-strategy</url>
-
-    <description>An EverywhereStrategy implementation for Apache Cassandra.</description>
-
+    <artifactId>everywhere-strategy-parent</artifactId>
+    <version>1.0</version>
+    <packaging>pom</packaging>
+    
+    <modules>
+        <module>cassandra-2.2</module>
+        <module>cassandra-3.0</module>
+        <module>cassandra-3.11</module>
+        <module>cassandra-4</module>
+    </modules>
+    
+    <name>everywhere-strategy-parent</name>
+    <description>Parent for Cassandra EverywhereStrategy implementations</description>
+    <url>https://github.com/instaclustr/cassandra-everywhere-strategy</url>
+    
+    <inceptionYear>2020</inceptionYear>
+    
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+    
+    <developers>
+        <developer>
+            <name>Adam Zegelin</name>
+            <organization>Instaclustr</organization>
+            <organizationUrl>https://www.instaclustr.com</organizationUrl>
+            <email>adam@instaclustr.com</email>
+        </developer>
+        <developer>
+            <name>Stefan Miklosovic</name>
+            <organization>Instaclustr</organization>
+            <organizationUrl>https://www.instaclustr.com</organizationUrl>
+            <email>stefan.miklosovic@instaclustr.com</email>
+        </developer>
+    </developers>
+    
     <organization>
         <name>Instaclustr</name>
-        <url>https://www.instaclustr.com</url>
+        <url>https://instaclustr.com</url>
     </organization>
-
+    
     <scm>
-        <connection>scm:git:git://github.com/instaclustr/everywhere-strategy.git</connection>
-        <url>${project.url}</url>
-        <tag>HEAD</tag>
+        <connection>scm:git:git://git@github.com:instaclustr/cassandra-everywhere-strategy.git</connection>
+        <developerConnection>scm:git:ssh://github.com/instaclustr/cassandra-everywhere-strategy.git</developerConnection>
+        <url>git://github.com/instaclustr/cassandra-everywhere-strategy.git</url>
     </scm>
-
+    
     <properties>
         <maintainer>Adam Zegelin &lt;adam@instaclustr.com&gt;</maintainer>
-
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <version.jdeb>1.8</version.jdeb>
+        <version.rpm>1.5.0</version.rpm>
+        <version.maven.release.plugin>2.5.3</version.maven.release.plugin>
+        
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.cassandra</groupId>
-            <artifactId>cassandra-all</artifactId>
-            <version>3.11.6</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
-
+    
     <build>
-        <finalName>instaclustr-${project.artifactId}-${project.version}</finalName>
-
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.3</version>
-
-                <configuration>
-                    <pushChanges>false</pushChanges>
-                    <tagNameFormat>v@{project.version}</tagNameFormat>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <artifactId>jdeb</artifactId>
-                <groupId>org.vafer</groupId>
-                <version>1.8</version>
-
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jdeb</goal>
-                        </goals>
-                        <configuration>
-                            <name>instaclustr-${project.artifactId}</name>
-                            <deb>${project.build.directory}/[[name]]_${project.version}_all.deb</deb>
-                            <dataSet>
-                                <data>
-                                    <src>${project.build.directory}/${project.build.finalName}.jar</src>
-                                    <type>file</type>
-                                    <mapper>
-                                        <type>perm</type>
-                                        <prefix>/usr/share/cassandra/lib</prefix>
-                                    </mapper>
-                                </data>
-                            </dataSet>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>de.dentrassi.maven</groupId>
-                <artifactId>rpm</artifactId>
-                <version>1.5.0</version>
-
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>rpm</goal>
-                        </goals>
-                        <configuration>
-                            <packageName>instaclustr-${project.artifactId}</packageName>
-                            <group>Applications/Databases</group>
-                            <packager>${maintainer}</packager>
-
-                            <skipSigning>true</skipSigning>
-
-                            <requires>
-                                <require>
-                                    <name>cassandra</name>
-                                    <version>2.0</version>
-                                    <greaterOrEqual />
-                                </require>
-                            </requires>
-
-                            <entries>
-                                <entry>
-                                    <name>/usr/share/cassandra/lib/${project.build.finalName}.jar</name>
-                                    <file>${project.build.directory}/${project.build.finalName}.jar</file>
-                                </entry>
-                            </entries>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>${version.maven.release.plugin}</version>
+                    
+                    <configuration>
+                        <pushChanges>false</pushChanges>
+                        <tagNameFormat>v@{project.version}</tagNameFormat>
+                    </configuration>
+                </plugin>
+                
+                <plugin>
+                    <groupId>org.vafer</groupId>
+                    <artifactId>jdeb</artifactId>
+                    <version>${version.jdeb}</version>
+                    
+                    <executions>
+                        <execution>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>jdeb</goal>
+                            </goals>
+                            <configuration>
+                                <name>instaclustr-${project.artifactId}</name>
+                                <deb>${project.build.directory}/[[name]]_${project.version}_all.deb
+                                </deb>
+                                <dataSet>
+                                    <data>
+                                        <src>${project.build.directory}/${project.build.finalName}.jar</src>
+                                        <type>file</type>
+                                        <mapper>
+                                            <type>perm</type>
+                                            <prefix>/usr/share/cassandra/lib</prefix>
+                                        </mapper>
+                                    </data>
+                                </dataSet>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                
+                <plugin>
+                    <groupId>de.dentrassi.maven</groupId>
+                    <artifactId>rpm</artifactId>
+                    <version>${version.rpm}</version>
+                    
+                    <executions>
+                        <execution>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>rpm</goal>
+                            </goals>
+                            <configuration>
+                                <packageName>instaclustr-${project.artifactId}</packageName>
+                                <group>Applications/Databases</group>
+                                <packager>${maintainer}</packager>
+                                
+                                <skipSigning>true</skipSigning>
+                                
+                                <entries>
+                                    <entry>
+                                        <name>/usr/share/cassandra/lib/${project.build.finalName}.jar</name>
+                                        <file>${project.build.directory}/${project.build.finalName}.jar</file>
+                                    </entry>
+                                </entries>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
+
 </project>

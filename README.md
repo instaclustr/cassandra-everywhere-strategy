@@ -145,14 +145,14 @@ So we resort to reflection to fix this. Yuck. But, it works…
 
 | Cassandra Version | Status |
 | --- | --- |
-| 3.11.x | Compatible |
-| 4.x | _Untested_ |
-| 3.0.x | _Untested_ |
-| 2.2.x | _Untested_ |
-| 2.1.x | _Untested_ |
-| 2.0.x | Unsupported |
+| 3.11.x | Supported |
+| 4.x | Supported |
+| 3.0.x | _Supported_ |
+| 2.2.x | _Supported_ |
+| 2.1.x | _Supported_ |
+| 2.0.x | Supported |
 
-
+For 2.1.x and 2.0.x versions, you can use version 2.2.x, it is compatible.
 
 ## License
 
