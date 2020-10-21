@@ -5,7 +5,7 @@
     
     <groupId>com.instaclustr</groupId>
     <artifactId>everywhere-strategy-parent</artifactId>
-    <version>1.0</version>
+    <version>1.0.0</version>
     <packaging>pom</packaging>
     
     <modules>
@@ -60,6 +60,8 @@
         <version.rpm>1.5.0</version.rpm>
         <version.maven.release.plugin>2.5.3</version.maven.release.plugin>
         
+        <outputDirectory>${project.build.directory}</outputDirectory>
+        
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         
@@ -67,6 +69,16 @@
     </properties>
     
     <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <outputDirectory>${outputDirectory}</outputDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -79,12 +91,10 @@
                         <tagNameFormat>v@{project.version}</tagNameFormat>
                     </configuration>
                 </plugin>
-                
                 <plugin>
                     <groupId>org.vafer</groupId>
                     <artifactId>jdeb</artifactId>
                     <version>${version.jdeb}</version>
-                    
                     <executions>
                         <execution>
                             <phase>package</phase>
@@ -92,12 +102,11 @@
                                 <goal>jdeb</goal>
                             </goals>
                             <configuration>
-                                <name>instaclustr-${project.artifactId}</name>
-                                <deb>${project.build.directory}/[[name]]_${project.version}_all.deb
-                                </deb>
+                                <name>${project.artifactId}</name>
+                                <deb>${outputDirectory}/[[name]]_${project.version}.deb</deb>
                                 <dataSet>
                                     <data>
-                                        <src>${project.build.directory}/${project.build.finalName}.jar</src>
+                                        <src>${outputDirectory}/${project.build.finalName}.jar</src>
                                         <type>file</type>
                                         <mapper>
                                             <type>perm</type>
@@ -109,12 +118,10 @@
                         </execution>
                     </executions>
                 </plugin>
-                
                 <plugin>
                     <groupId>de.dentrassi.maven</groupId>
                     <artifactId>rpm</artifactId>
                     <version>${version.rpm}</version>
-                    
                     <executions>
                         <execution>
                             <phase>package</phase>
@@ -122,7 +129,7 @@
                                 <goal>rpm</goal>
                             </goals>
                             <configuration>
-                                <packageName>instaclustr-${project.artifactId}</packageName>
+                                <packageName>${project.artifactId}</packageName>
                                 <group>Applications/Databases</group>
                                 <packager>${maintainer}</packager>
                                 
@@ -131,9 +138,10 @@
                                 <entries>
                                     <entry>
                                         <name>/usr/share/cassandra/lib/${project.build.finalName}.jar</name>
-                                        <file>${project.build.directory}/${project.build.finalName}.jar</file>
+                                        <file>${outputDirectory}/${project.build.finalName}.jar</file>
                                     </entry>
                                 </entries>
+                                <targetDir>${outputDirectory}</targetDir>
                             </configuration>
                         </execution>
                     </executions>

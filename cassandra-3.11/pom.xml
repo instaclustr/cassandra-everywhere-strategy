@@ -6,12 +6,12 @@
     <parent>
         <groupId>com.instaclustr</groupId>
         <artifactId>everywhere-strategy-parent</artifactId>
-        <version>1.0</version>
+        <version>1.0.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     
     <artifactId>everywhere-strategy-cassandra-3.11</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     
     <name>everywhere-strategy-cassandra-3.11</name>
     <description>An EverywhereStrategy implementation for Apache Cassandra 3.11</description>
@@ -20,14 +20,12 @@
         <dependency>
             <groupId>org.apache.cassandra</groupId>
             <artifactId>cassandra-all</artifactId>
-            <version>3.11.6</version>
+            <version>3.11.8</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
     
     <build>
-        <finalName>instaclustr-${project.artifactId}-${project.version}</finalName>
-        
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
