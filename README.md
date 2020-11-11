@@ -1,4 +1,8 @@
-# Instaclustr Everywhere Strategy
+# Instaclustr Everywhere Strategy - Migrate from DSE to Apache Cassandra
+
+Website: https://www.instaclustr.com/
+
+Documentation: https://www.instaclustr.com/support/documentation/
 
 [![Bintray Badge](https://img.shields.io/bintray/v/instaclustr/debian/instaclustr-everywhere-strategy.svg)](https://bintray.com/instaclustr/debian/instaclustr-everywhere-strategy)
 
@@ -18,7 +22,7 @@ is compatible with Cassandra.
 We offer a packaged version of `instaclustr-everywhere-strategy` for systems where Cassandra has been installed via the official Apache.org Debian or RPM package.
 
 This package will automatically install `instaclustr-everywhere-strategy` into an appropriate location for the Cassandra package install
-(i.e., `$CASSANDRA_HOME/lib`, which at present is `/usr/share/cassandra/lib`).
+(i.e. `$CASSANDRA_HOME/lib`, which at present is `/usr/share/cassandra/lib`).
 
 _Note_: These packages have a hard dependency for a `cassandra` package.
 If Cassandra hasn't been installed via your distributions package manager, installing `instaclustr-everywhere-strategy`
@@ -26,7 +30,7 @@ may force the Cassandra package to be installed. This may conflict with a tarbal
 See [Cassandra Tarball Installs](#cassandra-tarball-installs) below on how to install `instaclustr-everywhere-strategy`
 for tarball installs of Cassandra.
 
-#### Debian-based Distributions
+#### Debian-Based Distributions
 
 (Debian, Ubuntu, et al.)
 
@@ -39,7 +43,7 @@ for tarball installs of Cassandra.
 
 3. Run `apt-get install instaclustr-everywhere-stratgey` to install the package.
 
-#### RPM-based Distributions
+#### RPM-Based Distributions
 
 (RHEL, Fedora, CentOS, et al.)
 
@@ -126,19 +130,19 @@ In the output above, IPs `127.0.0.*` are DSE nodes, `127.0.1.*` are Cassandra no
 One common solution is to `ALTER` the `dse_*` keyspaces to use `NetworkTopologyStrategy` before joining Cassandra nodes to the cluster.
 While this works, it's also dangerous.
 DSE nodes reset the replication strategy back to `EverywhereStrategy` on startup.
-As a result, if any DSE nodes restart while Cassandra nodes are present the cluster, then schema disagreement will again occur. 
+As a result, if any DSE nodes restart while Cassandra nodes are present in the cluster then schema disagreement will again occur. 
 
 
 ## Implementation
 
-Our `EverywhereStartegy` implementation extends `NetworkTopologyStrategy`.
+Our `EverywhereStrategy` implementation extends `NetworkTopologyStrategy`.
 This is required because various core components inside Cassandra
-(e.g., [`ConsistencyLevel`](https://github.com/apache/cassandra/blob/trunk/src/java/org/apache/cassandra/db/ConsistencyLevel.java))
-perform `instanceof NetworkTopologyStrategy` checks when they need to be datacenter aware.
+(e.g. [`ConsistencyLevel`](https://github.com/apache/cassandra/blob/trunk/src/java/org/apache/cassandra/db/ConsistencyLevel.java))
+perform `instanceof NetworkTopologyStrategy` checks when they need to be data center aware.
 
 Yet, `NetworkTopologyStrategy` hasn't been designed to be extendable.
 A number of its fields are private final immutable, including `datacenters`, which is the DC→RF mapping.
-So we resort to reflection to fix this. Yuck. But, it works…
+So we resort to reflection to fix this. Yuck! But, it works…
 
 
 ## Version Compatibility
