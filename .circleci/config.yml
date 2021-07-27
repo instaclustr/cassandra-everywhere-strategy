@@ -1,8 +1,8 @@
 version: 2.1
 jobs:
   build:
-    docker:
-      - image: circleci/openjdk:8-jdk-stretch
+    machine:
+      image: ubuntu-2004:202104-01
 
     working_directory: ~/cassandra-everywhere-strategy
 
@@ -22,7 +22,7 @@ jobs:
             - ~/.m2
           key: m2-{{ checksum "pom.xml" }}
 
-      - run: mvn clean install
+      - run: ./conf/setup.sh && mvn clean install
 
       - persist_to_workspace:
           root: ~/cassandra-everywhere-strategy
