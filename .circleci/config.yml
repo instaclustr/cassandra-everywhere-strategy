@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   build:
     machine:
-      image: ubuntu-2004:202104-01
+      image: ubuntu-1604:202104-01
 
     working_directory: ~/cassandra-everywhere-strategy
 
