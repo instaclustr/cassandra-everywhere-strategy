@@ -56,6 +56,9 @@ public class EverywhereStrategy extends NetworkTopologyStrategy {
         this.datacenters.clear();
 
         for (final InetAddressAndPort endpoint : endpoints) {
+            if (!tokenMetadata.isMember(endpoint))
+                continue;
+
             final String datacenter = this.snitch.getDatacenter(endpoint);
             this.datacenters.merge(datacenter, ReplicationFactor.fromString("1"), (rf1, rf2) -> ReplicationFactor.fullOnly(rf1.fullReplicas + rf2.fullReplicas));
         }
