@@ -23,7 +23,7 @@ jobs:
           key: m2-{{ checksum "pom.xml" }}
 
       - run: sudo apt install -y openjdk-8-jdk
-      - run: echo "1" | sudo update-alternatives --config java
+      - run: echo "2" | sudo update-alternatives --config java
       - run: ./conf/setup.sh && mvn clean install && (cd test && ./run-tests.sh)
 
       - persist_to_workspace:
