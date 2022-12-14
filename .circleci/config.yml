@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   build:
     machine:
-      image: ubuntu-1604:202104-01
+      image: ubuntu-2004:202104-01
 
     working_directory: ~/cassandra-everywhere-strategy
 
@@ -22,6 +22,7 @@ jobs:
             - ~/.m2
           key: m2-{{ checksum "pom.xml" }}
 
+      - run: echo "2" | sudo update-alternatives --config java
       - run: ./conf/setup.sh && mvn clean install && (cd test && ./run-tests.sh)
 
       - persist_to_workspace:
@@ -31,6 +32,7 @@ jobs:
             - "cassandra-3.0/target/everywhere-strategy-cassandra*.jar"
             - "cassandra-3.11/target/everywhere-strategy-cassandra*.jar"
             - "cassandra-4.0/target/everywhere-strategy-cassandra*.jar"
+            - "cassandra-4.1/target/everywhere-strategy-cassandra*.jar"
 
   build-2-2:
     docker:
@@ -160,6 +162,38 @@ jobs:
             - "everywhere-strategy-cassandra-4.0*.deb"
             - "everywhere-strategy-cassandra-4.0*.rpm"
 
+  build-4-1:
+    docker:
+      - image: circleci/openjdk:8-jdk-stretch
+
+    working_directory: ~/cassandra-everywhere-strategy
+
+    environment:
+      MAVEN_OPTS: -Xmx3200m
+
+    steps:
+
+      - checkout
+
+      - restore_cache:
+          keys:
+            - m2-{{ checksum "pom.xml" }}
+            - m2-
+
+      - run: mvn clean install -DoutputDirectory=/tmp/artifacts
+
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: m2-{{ checksum "pom.xml" }}
+
+      - persist_to_workspace:
+          root: /tmp/artifacts
+          paths:
+            - "everywhere-strategy-cassandra-4.1*.jar"
+            - "everywhere-strategy-cassandra-4.1*.deb"
+            - "everywhere-strategy-cassandra-4.1*.rpm"
+
   publish-github-release-2-2:
     docker:
       - image: circleci/golang
@@ -213,6 +247,19 @@ jobs:
             go get github.com/tcnksm/ghr
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_TAG} ./artifacts/
 
+  publish-github-release-4-1:
+    docker:
+      - image: circleci/golang
+    steps:
+      - attach_workspace:
+          at: ./artifacts
+      - run:
+          name: "Publish 4.1 Release on GitHub"
+          command: |
+            set -xue
+            go get github.com/tcnksm/ghr
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_TAG} ./artifacts/
+
 workflows:
   version: 2
   main:
@@ -245,6 +292,12 @@ workflows:
               ignore: /.*/
             tags:
               only: /^v4.0.\d+-\d+\.\d+\.\d+$/
+      - build-4-1:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v4.1.\d+-\d+\.\d+\.\d+$/
       - publish-github-release-2-2:
           requires:
             - build-2-2
@@ -277,3 +330,11 @@ workflows:
               ignore: /.*/
             tags:
               only: /^v4.0.\d+-\d+\.\d+\.\d+$/
+      - publish-github-release-4-1:
+          requires:
+            - build-4-1
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v4.1.\d+-\d+\.\d+\.\d+$/

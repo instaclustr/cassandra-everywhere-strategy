@@ -149,11 +149,11 @@ So we resort to reflection to fix this. Yuck! But, it works…
 
 | Cassandra Version | Status |
 | --- | --- |
-| 3.11.x | Supported |
 | 4.x | Supported |
-| 3.0.x | _Supported_ |
-| 2.2.x | _Supported_ |
-| 2.1.x | _Supported_ |
+| 3.11.x | Supported |
+| 3.0.x | Supported |
+| 2.2.x | Supported |
+| 2.1.x | Supported |
 | 2.0.x | Supported |
 
 For 2.1.x and 2.0.x versions, you can use version 2.2.x, it is compatible.
