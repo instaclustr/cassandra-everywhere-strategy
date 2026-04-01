@@ -10,11 +10,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/setup-java@v1.3.0
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@fa2e9d605c4eeb9fcad4c99c224cee0c6c7f3594 # v2.16.0
+        with:
+          egress-policy: audit
+
+      - uses: actions/setup-java@b74d5a6a962763ad3655696a314a4b34df4896c2 # v1.3.0
         with:
           java-version: 1.8
 
-      - uses: jfrog/setup-jfrog-cli@v1.2.0
+      - uses: step-security/setup-jfrog-cli@893a92f96c7727242adf0e603c77b1f2a22390e1 # v4.9.1
 
       - name: Setup JFrog CLI
         run: |
@@ -24,14 +29,14 @@ jobs:
           BINTRAY_API_USER: ${{ secrets.BINTRAY_API_USER }}
           BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
 
-      - uses: actions/cache@v1
+      - uses: actions/cache@f5ce41475b483ad7581884324a6eca9f48f8dcc7 # v1.2.1
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@ee0669bd1cc54295c223e0bb666b733df41de1c5 # v2.7.0
 
       - run: mvn -B package
 
